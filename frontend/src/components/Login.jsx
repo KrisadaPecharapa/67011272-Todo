@@ -1,7 +1,7 @@
 // frontend/src/components/Login.js
 import React, { useState } from 'react';
 
-const API_URL = 'http://localhost:5001/api';
+const API_URL = import.meta.env.VITE_API_URL
 
 function Login({ onLogin }) {
   const [username, setUsername] = useState('');
