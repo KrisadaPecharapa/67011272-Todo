@@ -25,7 +25,7 @@ function App() {
   };
 
   return (
-    <div className="App">
+    <div className="w-screen h-screen bg-blue-400">
       <h1>Full Stack Todo App</h1>
       {/* Conditional rendering based on login status */}
       {currentUser ? (
