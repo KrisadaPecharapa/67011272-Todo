@@ -107,30 +107,35 @@ function TodoList({ username, onLogout }) {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h2>Todo List for: {username}</h2>
-        <button onClick={handleLogout}>Logout</button>
+        <button onClick={handleLogout} className='text-sm text-gray-500 hover:text-orange-500 active:text-orange-800 active:underline'>
+          Logout</button>
       </div>
 
-      <form onSubmit={handleAddTodo}>
+      <form onSubmit={handleAddTodo} className='flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-0'>
         <input
+          className='h-10 w-full sm:w-56 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-center sm:text-left outline-none'
           type="text"
           placeholder="New Task"
           value={newTask}
           onChange={(e) => setNewTask(e.target.value)}
         />
-        <button type="submit">Add Task</button>
+        <button type="submit" className='h-10 mt-2 sm:mt-0 w-full rounded-md bg-orange-500 px-4 text-white hover:bg-orange-600 sm:ml-3 sm:w-auto active:bg-orange-700'>
+          Add Task</button>
       </form>
 
-      <ul>
+      <ul className='mt-4 space-y-2'>
         {todos.map(todo => (
           <li key={todo.id} style={{ textDecoration: todo.done ? 'line-through' : 'none' }}>
             <input
               type="checkbox"
+              className='mr-2 accent-gray-600 hover:accent-gray-800'
               checked={!!todo.done} // Convert MySQL's 0/1 to boolean
               onChange={() => handleToggleDone(todo.id, todo.done)}
             />
             {todo.task}
-            <small> (Updated: {new Date(todo.updated).toLocaleString()})</small>
-            <button onClick={() => handleDeleteTodo(todo.id)} style={{ marginLeft: '10px' }}>Delete</button>
+            <small className='block sm:inline text-xs text-gray-500 sm:ml-2'> (Updated: {new Date(todo.updated).toLocaleString()})</small>
+            <button onClick={() => {const ok = window.confirm(`Delete "${todo.task}"?`); if (ok) handleDeleteTodo(todo.id);}} className='ml-2 rounded-md bg-red-500 text-white border border-red-500 sm:border-gray-300 px-2 py-1 text-sm active:bg-red-700 sm:active:bg-red-700 sm:bg-transparent sm:text-gray-600 sm:hover:border-red-500 sm:hover:bg-red-500 sm:hover:text-white'>
+              Delete</button>
           </li>
         ))}
       </ul>
