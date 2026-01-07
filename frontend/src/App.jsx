@@ -49,10 +49,10 @@ function App() {
           <div className="text-xs text-slate-500">
             {currentUser ? (
               <span>
-                Signed in as <span className="font-semibold">{currentUser}</span>
+                Login as <span className="font-semibold">{currentUser}</span>
               </span>
             ) : (
-              <span>Not signed in</span>
+              <span>Not Login</span>
             )}
           </div>
         </div>
