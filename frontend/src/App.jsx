@@ -46,7 +46,7 @@ function App() {
           </div>
 
           {/* Right side status */}
-          <div className="text-xs text-slate-500">
+          <div className="text-xs text-slate-500 rounded-2xl border border-orange-700 px-2 py-2">
             {currentUser ? (
               <span>
                 Login as <span className="font-semibold">{currentUser}</span>
