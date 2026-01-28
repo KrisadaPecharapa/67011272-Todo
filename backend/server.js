@@ -54,7 +54,8 @@ app.post('/api/login', (req, res) => {
 // 1. READ: Get all todos for a specific user
 app.get('/api/todos/:username', (req, res) => {
   const { username } = req.params;
-  const sql = 'SELECT id, task, done, updated FROM todo WHERE username = ? ORDER BY id DESC';
+  // Select status and target_datetime; order by target_datetime descending
+  const sql = 'SELECT id, task, status, target_datetime, updated FROM todo WHERE username = ? ORDER BY target_datetime DESC';
   db.query(sql, [username], (err, results) => {
     if (err) return res.status(500).send(err);
     res.json(results);
@@ -63,26 +64,35 @@ app.get('/api/todos/:username', (req, res) => {
 
 // 2. CREATE: Add a new todo item
 app.post('/api/todos', (req, res) => {
-  const { username, task } = req.body;
+  const { username, task, status, target_datetime } = req.body; // Accept new fields
   if (!username || !task) {
     return res.status(400).send({ message: 'Username and task are required' });
   }
-  // Note: 'done' defaults to FALSE in the DB schema
-  const sql = 'INSERT INTO todo (username, task) VALUES (?, ?)';
-  db.query(sql, [username, task], (err, result) => {
+
+  // Insert status and target_datetime. Default status to 'Todo' if not provided.
+  const sql = 'INSERT INTO todo (username, task, status, target_datetime) VALUES (?, ?, ?, ?)';
+  const values = [username, task, status || 'Todo', target_datetime || null];
+
+  db.query(sql, values, (err, result) => {
     if (err) return res.status(500).send(err);
-    // Return the created item details including the new ID
-    res.status(201).send({ id: result.insertId, username, task, done: 0, updated: new Date() });
+    res.status(201).send({ 
+      id: result.insertId, 
+      username, 
+      task, 
+      status: status || 'Todo', 
+      target_datetime: target_datetime || null,
+      updated: new Date() 
+    });
   });
 });
 
-// 3. UPDATE: Toggle the 'done' status
+// 3. UPDATE: Change the status
 app.put('/api/todos/:id', (req, res) => {
   const { id } = req.params;
-  const { done } = req.body;
+  const { status } = req.body; // Expect 'status' instead of 'done'
 
-  const sql = 'UPDATE todo SET done = ? WHERE id = ?';
-  db.query(sql, [done, id], (err, result) => {
+  const sql = 'UPDATE todo SET status = ? WHERE id = ?';
+  db.query(sql, [status, id], (err, result) => {
     if (err) return res.status(500).send(err);
     if (result.affectedRows === 0) {
       return res.status(404).send({ message: 'Todo not found' });
