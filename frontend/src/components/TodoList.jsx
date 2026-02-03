@@ -15,7 +15,7 @@ function TodoList({ username, onLogout }) {
   // 1. READ: Fetch all todos
   const fetchTodos = async () => {
     try {
-      const response = await fetch(`${API_URL}/todos/${username}`);
+      const response = await fetch(`${API_URL}/todos/${encodeURIComponent(username)}`);
       if (!response.ok) return;
       const data = await response.json();
       
@@ -33,7 +33,7 @@ function TodoList({ username, onLogout }) {
   // 2. CREATE: Add a new todo with Target Date and Default Status
   const handleAddTodo = async (e) => {
     e.preventDefault();
-    if (!newTask.trim()) return;
+    if (!newTask.trim() || !username) return;
 
     try {
       const response = await fetch(`${API_URL}/todos`, {
@@ -89,7 +89,7 @@ function TodoList({ username, onLogout }) {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('todo_username');
+    localStorage.removeItem('todo_user');
     onLogout();
   };
 

@@ -1,27 +1,39 @@
 // frontend/src/App.js
 import React, { useState, useEffect } from 'react';
-import Login from './components/Login';
+import Auth from './components/Auth';
 import TodoList from './components/TodoList';
 import ceiLogo from './assets/cei-logo.png';
 
 function App() {
+  const API_URL = import.meta.env.VITE_API_URL;
+  const ASSET_BASE_URL = API_URL?.replace(/\/api\/?$/, '');
   const [currentUser, setCurrentUser] = useState(null);
+  const profileImageSrc = currentUser?.profile_image_path
+    ? (currentUser.profile_image_path.startsWith('http')
+      ? currentUser.profile_image_path
+      : `${ASSET_BASE_URL}${currentUser.profile_image_path}`)
+    : '';
 
   // Check for stored username on initial load
   useEffect(() => {
-    const storedUser = localStorage.getItem('todo_username');
+    const storedUser = localStorage.getItem('todo_user');
     if (storedUser) {
-      setCurrentUser(storedUser);
+      try {
+        const parsed = JSON.parse(storedUser);
+        setCurrentUser(parsed);
+      } catch (err) {
+        localStorage.removeItem('todo_user');
+      }
     }
   }, []);
 
-  const handleLogin = (username) => {
-    setCurrentUser(username);
+  const handleLogin = (user) => {
+    setCurrentUser(user);
   };
 
   const handleLogout = () => {
     // Clear username from local storage and state
-    localStorage.removeItem('todo_username');
+    localStorage.removeItem('todo_user');
     setCurrentUser(null);
   };
 
@@ -46,10 +58,17 @@ function App() {
           </div>
 
           {/* Right side status */}
-          <div className="text-xs text-slate-500 rounded-2xl border border-orange-700 px-2 py-2">
+          <div className="flex items-center gap-2 text-xs text-slate-500 rounded-2xl border border-orange-700 px-2 py-2">
+            {profileImageSrc ? (
+              <img
+                src={profileImageSrc}
+                alt="Profile"
+                className="h-7 w-7 rounded-full object-cover"
+              />
+            ) : null}
             {currentUser ? (
               <span>
-                Login as <span className="font-semibold">{currentUser}</span>
+                Login as <span className="font-semibold">{currentUser.username}</span>
               </span>
             ) : (
               <span>Not Login</span>
@@ -66,15 +85,15 @@ function App() {
           </h1>
           <p className="mt-1 text-sm text-slate-600">
             {currentUser
-            ? `Managing tasks as ${currentUser}.`
-            : 'Login with your username to manage tasks.'}
+            ? `Managing tasks as ${currentUser.username}.`
+            : 'Login or register to manage tasks.'}
           </p>
 
           <div className="mt-6">
             {currentUser ? (
-              <TodoList username={currentUser} onLogout={handleLogout} />
+              <TodoList username={currentUser.username} onLogout={handleLogout} />
             ) : (
-              <Login onLogin={handleLogin} />
+              <Auth onLogin={handleLogin} />
             )}
           </div>
         </div>
