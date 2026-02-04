@@ -2,12 +2,14 @@
 import React, { useState, useEffect } from 'react';
 import Auth from './components/Auth';
 import TodoList from './components/TodoList';
+import TeamWorkspace from './components/TeamWorkspace';
 import ceiLogo from './assets/cei-logo.png';
 
 function App() {
   const API_URL = import.meta.env.VITE_API_URL;
   const ASSET_BASE_URL = API_URL?.replace(/\/api\/?$/, '');
   const [currentUser, setCurrentUser] = useState(null);
+  const [workspaceMode, setWorkspaceMode] = useState('personal');
   const profileImageSrc = currentUser?.profile_image_path
     ? (currentUser.profile_image_path.startsWith('http')
       ? currentUser.profile_image_path
@@ -35,6 +37,7 @@ function App() {
     // Clear username from local storage and state
     localStorage.removeItem('todo_user');
     setCurrentUser(null);
+    setWorkspaceMode('personal');
   };
 
   return (
@@ -91,7 +94,29 @@ function App() {
 
           <div className="mt-6">
             {currentUser ? (
-              <TodoList user={currentUser} onLogout={handleLogout} />
+              <div className="space-y-4">
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setWorkspaceMode('personal')}
+                    className={`rounded-md px-3 py-2 text-xs ${workspaceMode === 'personal' ? 'bg-orange-500 text-white' : 'bg-slate-100 text-slate-700'}`}
+                  >
+                    Personal Tasks
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setWorkspaceMode('team')}
+                    className={`rounded-md px-3 py-2 text-xs ${workspaceMode === 'team' ? 'bg-orange-500 text-white' : 'bg-slate-100 text-slate-700'}`}
+                  >
+                    Team Workspace
+                  </button>
+                </div>
+                {workspaceMode === 'personal' ? (
+                  <TodoList username={currentUser.username} onLogout={handleLogout} />
+                ) : (
+                  <TeamWorkspace currentUser={currentUser} />
+                )}
+              </div>
             ) : (
               <Auth onLogin={handleLogin} />
             )}
