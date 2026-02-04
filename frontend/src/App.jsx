@@ -91,7 +91,7 @@ function App() {
 
           <div className="mt-6">
             {currentUser ? (
-              <TodoList username={currentUser.username} onLogout={handleLogout} />
+              <TodoList user={currentUser} onLogout={handleLogout} />
             ) : (
               <Auth onLogin={handleLogin} />
             )}
